@@ -2,7 +2,7 @@ import { Account } from "jazz-tools";
 import { useAccount, useCoState } from "jazz-tools/react";
 import { ChatRoom } from "./schema.ts";
 import { Link, Trash2 } from "lucide-react";
-import { ChatBody, InputBar, HonkBubbles } from "./ui.tsx";
+import { ChatBody, InputBar, HonkBubbles, ChatTopBar } from "./ui.tsx";
 
 export function ChatScreen(props: { chatID: string }) {
   const chatRoom = useCoState(ChatRoom, props.chatID);
@@ -20,6 +20,9 @@ export function ChatScreen(props: { chatID: string }) {
   const otherBubble =
     userBubbleNumber === 1 ? chatRoom.bubble2 : chatRoom.bubble1;
 
+  const otherUserId =
+    userBubbleNumber === 1 ? chatRoom.bubble2Owner : chatRoom.bubble1Owner;
+
   const handleMyBubbleChange = (text: string) => {
     myBubble?.$jazz.applyDiff(text);
   };
@@ -34,6 +37,7 @@ export function ChatScreen(props: { chatID: string }) {
 
   return (
     <>
+      <ChatTopBar otherUserId={otherUserId} />
       <ChatBody>
         <HonkBubbles
           myBubble={myBubble?.toString() || ""}
@@ -45,19 +49,28 @@ export function ChatScreen(props: { chatID: string }) {
       <InputBar>
         <button
           onClick={copyLink}
-          className="text-stone-500 p-1.5 rounded-full hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors"
+          className=" text-stone-500 p-1.5 rounded-full hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors"
           title="Copy link"
         >
           <Link size={24} strokeWidth={1.5} />
         </button>
 
-        <div className="flex-1 text-center text-sm text-stone-500">
-          {me.profile?.name || "Anonymous"}
+        <div className="flex-1 text-center content-center text-sm text-stone-500">
+          <input
+            type="text"
+            value={me?.profile?.name ?? ""}
+            className="bg-transparent h-full text-center content-center text-xl font-sans"
+            onChange={(e) => {
+              if (!me?.profile) return;
+              me.profile.$jazz.set("name", e.target.value);
+            }}
+            placeholder="Set username"
+          />
         </div>
 
         <button
           onClick={clearMyBubble}
-          className="text-stone-500 p-1.5 rounded-full hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors"
+          className="text-stone-500 p-1.5 dark:hover:text-red-400 transition-colors"
           title="Clear my bubble"
         >
           <Trash2 size={24} strokeWidth={1.5} />

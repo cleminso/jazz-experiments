@@ -2,14 +2,14 @@ packages:
   - examples/*
 
 catalog:
-  "@tailwindcss/vite": ^4.1.13
-  "@types/react": 19.1.0
-  "@types/react-dom": 19.1.0
-  "@vitejs/plugin-react": ^4.5.1
-  "@vitejs/plugin-react-swc": ^3.10.1
-  clsx: ^2.1.1
+  '@tailwindcss/vite': ^4.1.13
+  '@types/react': 19.1.0
+  '@types/react-dom': 19.1.0
+  '@vitejs/plugin-react': ^4.5.1
+  '@vitejs/plugin-react-swc': ^3.10.1
+  clsx: 2.1.1
   jazz-tools: ^0.18.13
-  lucide-react: ^0.544.0
+  lucide-react: 0.544.0
   react: 19.1.0
   react-dom: 19.1.0
   tailwindcss: ^4.1.13
@@ -17,10 +17,10 @@ catalog:
   vite: 6.3.5
 
 ignoredBuiltDependencies:
-  - "@swc/core"
+  - '@swc/core'
 
 onlyBuiltDependencies:
-  - "@biomejs/biome"
-  - "@tailwindcss/oxide"
+  - '@biomejs/biome'
+  - '@tailwindcss/oxide'
   - esbuild
   - react-native-nitro-modules

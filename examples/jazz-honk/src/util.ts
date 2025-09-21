@@ -1,20 +1,9 @@
-// This is only for demo purposes for https://jazz.tools
-// This is NOT needed to make the chat work
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-import { ChatRoom } from "./schema";
-
-export function onChatLoad(chat: ChatRoom) {
-  if (window.parent) {
-    chat.$jazz.waitForSync().then(() => {
-      window.parent.postMessage(
-        { type: "chat-load", id: "/chat/" + chat.$jazz.id },
-        "*",
-      );
-    });
-  }
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
-
-export const inIframe = window.self !== window.top;
 
 const fruits = [
   "guave",
