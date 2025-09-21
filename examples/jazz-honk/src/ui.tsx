@@ -1,8 +1,4 @@
-import clsx from "clsx";
-import { CoPlainText, ImageDefinition } from "jazz-tools";
-import { Image } from "jazz-tools/react";
-import { ImageIcon } from "lucide-react";
-import { useId, useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export function AppContainer(props: { children: React.ReactNode }) {
   return (
@@ -28,138 +24,10 @@ export function ChatBody(props: { children: React.ReactNode }) {
   );
 }
 
-export function EmptyChatMessage() {
-  return (
-    <div className="h-full text-base text-stone-500 flex items-center justify-center px-3 md:text-2xl">
-      Start a conversation below.
-    </div>
-  );
-}
-
-export function BubbleContainer(props: {
-  children: React.ReactNode;
-  fromMe: boolean | undefined;
-}) {
-  const align = props.fromMe ? "items-end" : "items-start";
-  return (
-    <div className={`${align} flex flex-col m-3`} role="row">
-      {props.children}
-    </div>
-  );
-}
-
-export function BubbleBody(props: {
-  children: React.ReactNode;
-  fromMe: boolean | undefined;
-}) {
-  return (
-    <div
-      className={clsx(
-        "line-clamp-10 text-ellipsis whitespace-pre-wrap",
-        "rounded-2xl overflow-hidden max-w-[calc(100%-5rem)] shadow-sm p-1",
-        props.fromMe
-          ? "bg-white dark:bg-stone-900 dark:text-white"
-          : "bg-blue text-white",
-      )}
-    >
-      {props.children}
-    </div>
-  );
-}
-
-export function BubbleText(props: {
-  text: CoPlainText | string;
-  className?: string;
-}) {
-  return (
-    <p className={clsx("px-2 leading-relaxed", props.className)}>
-      {props.text}
-    </p>
-  );
-}
-
-export function BubbleImage(props: { image: ImageDefinition }) {
-  return (
-    <Image
-      imageId={props.image.$jazz.id}
-      className="h-auto max-h-80 max-w-full rounded-t-xl mb-1"
-      height="original"
-      width="original"
-    />
-  );
-}
-
-export function BubbleInfo(props: { by: string | undefined; madeAt: Date }) {
-  return (
-    <div className="text-xs text-neutral-500 mt-1.5">
-      {props.by} · {props.madeAt.toLocaleTimeString()}
-    </div>
-  );
-}
-
 export function InputBar(props: { children: React.ReactNode }) {
   return (
     <div className="p-3 bg-white border-t shadow-2xl mt-auto flex gap-1 dark:bg-transparent dark:border-stone-900">
       {props.children}
-    </div>
-  );
-}
-
-export function ImageInput({
-  onImageChange,
-}: {
-  onImageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const onUploadClick = () => {
-    inputRef.current?.click();
-  };
-
-  return (
-    <>
-      <button
-        type="button"
-        aria-label="Send image"
-        title="Send image"
-        onClick={onUploadClick}
-        className="text-stone-500 p-1.5 rounded-full hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors"
-      >
-        <ImageIcon size={24} strokeWidth={1.5} />
-      </button>
-
-      <label className="sr-only">
-        Image
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/png, image/jpeg, image/gif"
-          onChange={onImageChange}
-        />
-      </label>
-    </>
-  );
-}
-
-export function TextInput(props: { onSubmit: (text: string) => void }) {
-  const inputId = useId();
-
-  return (
-    <div className="flex-1">
-      <label className="sr-only" htmlFor={inputId}>
-        Type a message and press Enter
-      </label>
-      <input
-        id={inputId}
-        className="rounded-full text-center py-1 px-3 border block w-full placeholder:text-stone-500 dark:bg-stone-925 dark:text-white dark:border-stone-900"
-        placeholder="Type a message and press Enter"
-        maxLength={2048}
-        onKeyDown={({ key, currentTarget: input }) => {
-          if (key !== "Enter" || !input.value) return;
-          props.onSubmit(input.value);
-          input.value = "";
-        }}
-      />
     </div>
   );
 }
@@ -175,34 +43,62 @@ export function HonkBubbles({
 }) {
   const [localText, setLocalText] = useState(myBubble);
   const [isTyping, setIsTyping] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [otherIsTyping, setOtherIsTyping] = useState(false);
   const debounceTimerRef = useRef<number | undefined>(undefined);
+  const otherDebounceTimerRef = useRef<number | undefined>(undefined);
+
+  const MAX_CHARS = 240;
 
   useEffect(() => {
     setLocalText(myBubble);
   }, [myBubble]);
 
+  useEffect(() => {
+    clearTimeout(otherDebounceTimerRef.current);
+    const otherHasContent = otherBubble.trim().length > 0;
+    setOtherIsTyping(otherHasContent);
+
+    if (otherHasContent) {
+      otherDebounceTimerRef.current = setTimeout(
+        () => setOtherIsTyping(false),
+        3000,
+      );
+    }
+  }, [otherBubble]);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
+
+    if (newText.length > MAX_CHARS) return;
+
     setLocalText(newText);
     onMyBubbleChange(newText);
 
-    // Simple debounce logic
     clearTimeout(debounceTimerRef.current);
     const hasContent = newText.trim().length > 0;
     setIsTyping(hasContent);
 
     if (hasContent) {
-      debounceTimerRef.current = setTimeout(() => setIsTyping(false), 3000);
+      debounceTimerRef.current = setTimeout(() => setIsTyping(false), 2000);
     }
   };
 
-  // Single height calculation
-  const getBubbleHeights = () => {
-    const otherHasContent = otherBubble.trim().length > 0;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      setLocalText("");
+      onMyBubbleChange("");
 
-    if (isTyping && !otherHasContent) return { other: "15%", mine: "70%" };
-    if (!isTyping && otherHasContent) return { other: "70%", mine: "15%" };
-    if (isTyping && otherHasContent) return { other: "50%", mine: "50%" };
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = setTimeout(() => setIsTyping(false), 2000);
+    }
+  };
+
+  const getBubbleHeights = () => {
+    if (isTyping && !otherIsTyping) return { other: "15%", mine: "70%" };
+    if (!isTyping && otherIsTyping) return { other: "70%", mine: "15%" };
+    if (isTyping && otherIsTyping) return { other: "50%", mine: "50%" };
     return { other: "15%", mine: "15%" };
   };
 
@@ -211,32 +107,41 @@ export function HonkBubbles({
   return (
     <div className="flex flex-col justify-between h-full p-6 gap-6">
       <div style={{ height: heights.other }} className="flex-shrink-0">
-        <div className="h-full bg-stone-100 dark:bg-stone-800 rounded-3xl p-6 border-2 border-stone-200 dark:border-stone-700">
-          <div className="text-sm text-stone-500 dark:text-stone-400 mb-2">
-            Other person
-          </div>
-          <div className="h-full overflow-y-auto">
-            <p className="text-stone-700 dark:text-stone-300 whitespace-pre-wrap leading-relaxed">
-              {otherBubble || "Type something..."}
-            </p>
+        <div className="h-full rounded-3xl flex items-center justify-center p-6 max-w-2xl mx-auto">
+          <div className="text-stone-700 dark:text-stone-300 whitespace-pre-wrap text-center text-base md:text-lg leading-relaxed tracking-wide overflow-hidden">
+            {otherBubble.length > MAX_CHARS
+              ? otherBubble.slice(0, MAX_CHARS) + "..."
+              : otherBubble || "Type something..."}
           </div>
         </div>
       </div>
 
       <div style={{ height: heights.mine }} className="flex-shrink-0">
-        <div className="h-full bg-blue-500 rounded-3xl p-6 border-2 border-blue-600">
-          <div className="text-sm text-blue-100 mb-2">You</div>
-          <textarea
-            value={localText}
-            onChange={handleChange}
-            placeholder="Type something..."
-            className="w-full h-full resize-none border-none outline-none leading-relaxed focus:ring-0 placeholder-blue-200"
-            style={{
-              backgroundColor: "transparent",
-              color: "#ffffff",
-              caretColor: "#ffffff",
-            }}
-          />
+        <div className="h-full bg-blue-500 rounded-3xl border-2 border-blue-600 p-6 flex items-center max-w-2xl mx-auto">
+          <div className="w-full flex flex-col">
+            <textarea
+              value={localText}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={isFocused ? "" : "Type something..."}
+              maxLength={MAX_CHARS}
+              className="w-full text-center content-center resize-none border-none outline-none focus:ring-0 placeholder-blue-200 text-base md:text-lg leading-relaxed tracking-wide overflow-hidden"
+              style={{
+                backgroundColor: "transparent",
+                color: "#ffffff",
+                caretColor: "#ffffff",
+                minHeight: "1.5rem",
+                maxHeight: "calc(100% - 1.5rem)",
+              }}
+            />
+            {isTyping && (
+              <div className="text-blue-200 text-xs mt-2 text-center">
+                {localText.length}/{MAX_CHARS}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
