@@ -166,6 +166,16 @@ export function InfoButton() {
                     </a>
                     <span className="text-stone-400">|</span>
                     <a
+                      href="https://cleminso.xyz/product-review/010-jazz-honk-experiment/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+                    >
+                      Blog
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                    <span className="text-stone-400">|</span>
+                    <a
                       href="https://jazz.tools"
                       target="_blank"
                       rel="noopener noreferrer"
