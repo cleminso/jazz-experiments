@@ -184,3 +184,13 @@
     @apply bg-background text-foreground;
     }
 }
+
+/* Mobile viewport height fix for older browsers */
+@supports not (height: 100dvh) {
+  .h-dvh {
+    height: 100vh;
+    /* Fallback for older browsers that don't support dvh */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}

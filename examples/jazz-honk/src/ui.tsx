@@ -5,7 +5,7 @@ import { InfoButton } from "./info";
 
 export function AppContainer(props: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col justify-between w-screen h-screen bg-stone-50 dark:bg-stone-925 dark:text-white">
+    <div className="flex flex-col justify-between w-screen h-dvh overflow-hidden bg-stone-50 dark:bg-stone-925 dark:text-white">
       {props.children}
     </div>
   );
@@ -118,17 +118,17 @@ export function HonkBubbles({
   };
 
   const getBubbleHeights = () => {
-    if (isTyping && !otherIsTyping) return { other: "15%", mine: "85%" };
-    if (!isTyping && otherIsTyping) return { other: "85%", mine: "15%" };
+    if (isTyping && !otherIsTyping) return { other: "35%", mine: "65%" };
+    if (!isTyping && otherIsTyping) return { other: "65%", mine: "35%" };
     if (isTyping && otherIsTyping) return { other: "50%", mine: "50%" };
-    return { other: "15%", mine: "15%" };
+    return { other: "25%", mine: "25%" };
   };
 
   const heights = getBubbleHeights();
 
   return (
     <div className="flex flex-col h-full p-3 sm:p-6">
-      <div style={{ height: heights.other }} className="flex-shrink-0">
+      <div style={{ height: heights.other, minHeight: "20%", maxHeight: "70%" }} className="flex-shrink-0">
         <div className="h-full flex items-center justify-center p-3 sm:p-6 mx-3 sm:mx-auto max-w-sm sm:max-w-md md:max-w-lg">
           <div className="text-stone-700 dark:text-stone-300 whitespace-pre-wrap text-center text-sm sm:text-base md:text-lg leading-relaxed tracking-wide overflow-hidden">
             {otherBubble.length > MAX_CHARS
@@ -140,7 +140,7 @@ export function HonkBubbles({
 
       <div className="flex-1" />
 
-      <div style={{ height: heights.mine }} className="flex-shrink-0">
+      <div style={{ height: heights.mine, minHeight: "20%", maxHeight: "70%" }} className="flex-shrink-0">
         <div className="h-full bg-blue-500 rounded-2xl sm:rounded-3xl p-3 sm:p-6 mx-3 sm:mx-auto max-w-sm sm:max-w-md md:max-w-lg">
           <div className="h-full flex flex-col">
             <textarea

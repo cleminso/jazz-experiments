@@ -106,6 +106,29 @@ export function InfoButton() {
                 <p>No send button, no chat history, simply two chat bubbles.</p>
               </div>
 
+              {/* How to use */}
+              <div>
+                <h3 className="font-semibold text-stone-800 dark:text-stone-200 mb-3 flex items-center gap-2">
+                  How to use
+                </h3>
+                <div className="text-sm space-y-2">
+                  <p>
+                    1. Open{" "}
+                    <a
+                      href="https://jazz-honk.vercel.app"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+                    >
+                      jazz-honk.vercel.app
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </p>
+                  <p>2. Copy chatRoom URL</p>
+                  <p>3. Send it to a friend or open a private browser window</p>
+                </div>
+              </div>
+
               {/* How it Works */}
               <div>
                 <h3 className="font-semibold text-stone-800 dark:text-stone-200 mb-3 flex items-center gap-2">
