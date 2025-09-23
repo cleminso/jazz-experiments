@@ -25,10 +25,7 @@ dist-ssr
 
 sync-db/
 
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+
 
 # env files
 .env
